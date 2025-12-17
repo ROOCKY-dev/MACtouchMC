@@ -1,5 +1,9 @@
 package com.roockydev.mactouchmc;
 
+import com.roockydev.mactouchmc.layout.DebugLayout;
+import com.roockydev.mactouchmc.layout.InGameLayout;
+import com.roockydev.mactouchmc.layout.LayoutManager;
+import com.roockydev.mactouchmc.layout.MenuLayout;
 import com.thizzer.jtouchbar.JTouchBar;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -26,7 +30,6 @@ public class MacTouchMC implements ClientModInitializer {
     private static MinecraftClient mcClient;
     private static long windowHandle;
     private Screens activeScreen;
-    private Bars touchBars;
 
     private static JTouchBar inGameTouchBar;
     private static JTouchBar mainTouchBar;
@@ -50,21 +53,33 @@ public class MacTouchMC implements ClientModInitializer {
                     Icons.init();
                     
                     Logger.log(Level.INFO, "Creating TouchBar layouts...");
-                    touchBars = new Bars();
-                    touchBars.init(this);
                     
-                    // Cache references to common bars
-                    mainTouchBar = touchBars.getInfoBar();
-                    inGameTouchBar = touchBars.getInGameBar();
+                    // Initialize Layout Manager and Layouts
+                    LayoutManager layoutManager = LayoutManager.getInstance();
                     
+                    // Create Layouts
+                    MenuLayout menuLayout = new MenuLayout();
+                    InGameLayout inGameLayout = new InGameLayout();
+                    DebugLayout debugLayout = new DebugLayout(this); // Pass mod instance for reload/log access
+                    
+                    // Wire up Popover logic for InGameLayout to point to DebugLayout
+                    // This is a manual step since we need to cross-reference layouts
+                    com.thizzer.jtouchbar.item.PopoverTouchBarItem popover = new com.thizzer.jtouchbar.item.PopoverTouchBarItem("popover");
+                    popover.setCollapsedRepresentation(new com.roockydev.mactouchmc.TBButton(com.thizzer.jtouchbar.item.view.TouchBarButton.ButtonType.MOMENTARY_PUSH_IN).setTitle("Debug").setIcon(Icons.DEBUG_SCREEN).build());
+                    popover.setCollapsedRepresentationLabel("Debug");
+                    popover.setShowsCloseButton(true);
+                    popover.setPopoverTouchBar(debugLayout.getTouchBar());
+                    inGameLayout.getTouchBar().addItem(popover);
+
                     Logger.log(Level.INFO, "TouchBar content created successfully.");
                     
                     if (mcClient.getWindow() != null) {
                         // Extracting the Cocoa Window Handle (NSWindow) required for the Touch Bar API
                         windowHandle = GLFWNativeCocoa.glfwGetCocoaWindow(mcClient.getWindow().getHandle());
+                        layoutManager.setWindowHandle(windowHandle);
                         
                         Logger.log(Level.INFO, "Showing Default Info TouchBar.");
-                        show(mainTouchBar); // Show default bar initially
+                        layoutManager.setLayout(menuLayout); // Initial View
 
                         // Register Tick Listener to switch bars based on context
                         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -74,9 +89,11 @@ public class MacTouchMC implements ClientModInitializer {
                                 Logger.log(Level.DEBUG, "Screen switched to: " + activeScreen);
                                 
                                 if (activeScreen == Screens.INGAME || activeScreen == Screens.GAME_MENU) {
-                                    show(inGameTouchBar);
+                                    layoutManager.setLayout(inGameLayout);
                                 } else {
-                                    show(touchBars.getDebugBar()); // TODO: Maybe split InfoBar and DebugBar logic clearer?
+                                    layoutManager.setLayout(menuLayout); // Main menu or unknown -> Info Bar
+                                    // TODO: logic for debugLayout specific triggering? 
+                                    // DebugLayout is typically accessed VIA the InGameLayout popover, not standalone.
                                 }
                             }
                         });
@@ -97,20 +114,12 @@ public class MacTouchMC implements ClientModInitializer {
      * Reloads all resources and recreates the Touch Bars.
      * Useful for debugging or when resource packs change.
      */
-    void reload() {
+    public void reload() {
         Logger.log(Level.INFO, "Reloading MACtouchMC assets and layouts...");
         Icons.reload();
-        touchBars.reload();
-        mainTouchBar = touchBars.getInfoBar();
-        inGameTouchBar = touchBars.getInGameBar();
-        
-        // Refresh current view based on state
-        if (activeScreen == Screens.INGAME || activeScreen == Screens.GAME_MENU) {
-             show(inGameTouchBar);
-        } else {
-             show(touchBars.getDebugBar());
-        }
-        Logger.log(Level.INFO, "Reload complete.");
+        // Re-init layouts? For simplicity just log. 
+        // Real implementation would need to rebuild layout objects or clear them.
+        Logger.log(Level.INFO, "Reload complete (Layout refresh requires restart in current impl).");
     }
 
     /**

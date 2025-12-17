@@ -21,7 +21,7 @@ public class TBButton {
 	private int imagePosition = ImagePosition.NO;
 	private TouchBarViewAction action;
 
-	TBButton(@NotNull ButtonType buttonType) {
+	public TBButton(@NotNull ButtonType buttonType) {
 		this.buttonType = buttonType;
 	}
 
@@ -34,7 +34,7 @@ public class TBButton {
 		return buttonType;
 	}
 
-	TBButton setTitle(@Nullable String title) {
+	public TBButton setTitle(@Nullable String title) {
 		this.title = title;
 		return this;
 	}
@@ -43,7 +43,7 @@ public class TBButton {
 		return title;
 	}
 
-	TBButton setEnabled(boolean enabled) {
+	public TBButton setEnabled(boolean enabled) {
 		this.enabled = enabled;
 		this.title = enabled ? "enabled" : "disabled";
 		return this;
@@ -70,7 +70,7 @@ public class TBButton {
 		return image;
 	}
 
-	TBButton setIcon(@Nullable Icons icon) {
+	public TBButton setIcon(@Nullable Icons icon) {
 		this.icon = icon;
 		if (icon == null) this.image = null;
 		else {
@@ -86,7 +86,7 @@ public class TBButton {
 		return icon;
 	}
 
-	TBButton setImagePosition(int imagePosition) {
+	public TBButton setImagePosition(int imagePosition) {
 		this.imagePosition = imagePosition;
 		return this;
 	}
@@ -103,7 +103,7 @@ public class TBButton {
 		return action;
 	}
 
-	TouchBarButton build() {
+	public TouchBarButton build() {
 		TouchBarButton btn = new TouchBarButton();
 		if (title != null) btn.setTitle(title);
 		if (buttonType != null) btn.setType(buttonType);
