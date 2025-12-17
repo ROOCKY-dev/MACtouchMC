@@ -1,3 +1,7 @@
+#Contribution Stuff
+
+
+# Build
 build/
 .gradle/
 run/
@@ -7,3 +11,7 @@ run/
 *.IML
 out/
 build_log.txt
+
+
+# New Icons generator Code By Author
+generate_icons.py
