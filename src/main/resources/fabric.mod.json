@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "mactouchmc",
+	"version": "${version}",
+
+	"name": "MACtouchMC",
+	"description": "Context-aware Touch Bar integration for Minecraft on macOS.",
+	"authors": [
+		"ROOCKYdev",
+		"MaximumFX"
+	],
+	"contact": {
+		"homepage": "https://github.com/MaximumFX/MCTouchBar",
+		"sources": "https://github.com/MaximumFX/MCTouchBar"
+	},
+
+	"license": "MIT",
+	"icon": "assets/mactouchmc/icon.png",
+
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"com.roockydev.mactouchmc.MacTouchMC"
+		]
+	},
+
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"java": ">=21",
+		"minecraft": ">=1.21"
+	},
+	"suggests": {
+		"flamingo": "*"
+	}
+}
