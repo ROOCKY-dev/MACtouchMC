@@ -87,7 +87,7 @@ public enum Icons {
         if (enabled && enabledIcons.containsKey(this)) return enabledIcons.get(this);
         if (!enabled && disabledIcons.containsKey(this)) return disabledIcons.get(this);
         
-        String assetPath = "/assets/mctouchbar/icons/" + this.name().toLowerCase() + (enabled ? "" : "_disabled") + ".png";
+        String assetPath = "/assets/mactouchmc/icons/" + this.name().toLowerCase() + (enabled ? "" : "_disabled") + ".png";
         InputStream stream = MacTouchMC.class.getResourceAsStream(assetPath);
         
         if (stream == null && !enabled) {
@@ -123,12 +123,12 @@ public enum Icons {
         String fileName = "icons/" + this.name().toLowerCase() + (enabled ? "" : "_disabled") + ".png";
         
         try {
-            Identifier identifier = Identifier.of("mctouchbar", fileName);
+            Identifier identifier = Identifier.of("mactouchmc", fileName);
             Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(identifier);
             
             if (resource.isEmpty() && !enabled) {
                 // Fallback
-                identifier = Identifier.of("mctouchbar", "icons/" + this.name().toLowerCase() + ".png");
+                identifier = Identifier.of("mactouchmc", "icons/" + this.name().toLowerCase() + ".png");
                 resource = MinecraftClient.getInstance().getResourceManager().getResource(identifier);
             }
 
@@ -143,7 +143,7 @@ public enum Icons {
                  return getDefaultIcon(enabled);
             }
         } catch (IOException e) {
-            Logger.log(Level.ERROR, "Unable to load image \"mctouchbar:" + fileName + "\", trying default image.");
+            Logger.log(Level.ERROR, "Unable to load image \"mactouchmc:" + fileName + "\", trying default image.");
             return getDefaultIcon(enabled);
         }
     }
