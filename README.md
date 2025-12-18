@@ -1,14 +1,16 @@
-# 🍏 MACtouchMC
-**The Ultimate Minecraft Touch Bar Integration for macOS**  
-*Experience Minecraft like never before with context-aware controls right at your fingertips.*
+# MACtouchMC 🖥️
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Fabric](https://img.shields.io/badge/Loader-Fabric-beige)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Platform](https://img.shields.io/badge/Platform-macOS%20(Intel%2FApple%20Silicon)-lightgrey)
 
-![Header](/assets/mactouchmc/header.png)
+**The ultimate Touch Bar integration for modern Minecraft.**
+Recover the functionality of your F-keys, control your media, and "Free the F Key" with custom input extensions.
 
-## ✨ Features
-🔥 **Context Awareness**: Seamlessly switches layouts between **Main Menu**, **In-Game**, and **Debug** modes.  
-🎮 **Custom Buttons**: Bind **ANY** Minecraft key to your Touch Bar with custom names and colors!  
-🛠️ **Debug Power**: Instantly reload chunks, show hitboxes, or copy coordinates without memorizing F3 combos.  
-🚀 **Apple Silicon Native**: Blazing fast and optimized for M1, M2, and M3 Macs.  
+## 🚀 Key Features
+* **Context Aware:** Automatically switches layouts (Menu, Game, Debug).
+* **Input Extension:** Remap physical keys to the Touch Bar to declutter your keyboard.
+* **Debug Suite:** One-tap access to Chunk Borders, Hitboxes, and Reload commands. 
 
 ---
 
