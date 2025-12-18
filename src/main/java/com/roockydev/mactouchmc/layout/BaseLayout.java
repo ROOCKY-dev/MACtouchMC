@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class BaseLayout implements TouchBarLayout {
 
-    protected final JTouchBar touchBar;
+    protected JTouchBar touchBar;
     protected final List<TouchBarWidget> widgets;
 
     public BaseLayout(String id) {

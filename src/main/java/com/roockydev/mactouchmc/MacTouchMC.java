@@ -30,9 +30,16 @@ public class MacTouchMC implements ClientModInitializer {
     private static MinecraftClient mcClient;
     private static long windowHandle;
     private Screens activeScreen;
+    private int tickCounter = 0;
 
     private static JTouchBar inGameTouchBar;
     private static JTouchBar mainTouchBar;
+    
+    // Layouts
+    private MenuLayout menuLayout;
+    private InGameLayout inGameLayout;
+    private DebugLayout debugLayout;
+    private com.roockydev.mactouchmc.layout.CustomLayout customLayout;
 
     // We strictly check for "mac" to prevent crashes on Windows/Linux environments even if the jar is loaded.
     public static boolean IS_MAC = System.getProperty("os.name").toLowerCase().contains("mac");
@@ -58,9 +65,13 @@ public class MacTouchMC implements ClientModInitializer {
                     LayoutManager layoutManager = LayoutManager.getInstance();
                     
                     // Create Layouts
-                    MenuLayout menuLayout = new MenuLayout();
-                    InGameLayout inGameLayout = new InGameLayout();
-                    DebugLayout debugLayout = new DebugLayout(this); // Pass mod instance for reload/log access
+                    menuLayout = new MenuLayout();
+                    inGameLayout = new InGameLayout(this);
+                    debugLayout = new DebugLayout(this); 
+                    customLayout = new com.roockydev.mactouchmc.layout.CustomLayout(this);
+                    
+                    LayoutManager.getInstance(); // Ensure initialized or just remove line. 
+                    // No registration needed.
                     
                     // Wire up Popover logic for InGameLayout to point to DebugLayout
                     // This is a manual step since we need to cross-reference layouts
@@ -83,7 +94,34 @@ public class MacTouchMC implements ClientModInitializer {
 
                         // Register Tick Listener to switch bars based on context
                         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                            // Check if screen changed
+                            
+                            // Debug logging for Screen Detection (Requested by user)
+                            // We log every 20 ticks (1 second) to avoid spam but generally track screens
+                            if (client.player != null && client.player.age % 40 == 0 && client.currentScreen != null) {
+                                 Logger.log(Level.INFO, "[DEBUG] Screen: " + client.currentScreen.getClass().getName());
+                            }
+
+                            // Prioritize Config Screen Detection
+                            String screenName = client.currentScreen == null ? "" : client.currentScreen.getClass().getName().toLowerCase();
+                            boolean inConfig = screenName.contains("config") || 
+                                               screenName.contains("yacl") || 
+                                               screenName.contains("keybind") || 
+                                               screenName.contains("controls");
+
+                            // Increment tick counter
+                            tickCounter++;
+                                    
+                            if (inConfig) {
+                                // Refresh Custom Layout periodically to reflect config changes and ensure it's up to date
+                                if (tickCounter % 20 == 0) { // Every second
+                                     customLayout.refresh();
+                                     layoutManager.forceShow();
+                                }
+                                layoutManager.setLayout(customLayout);
+                                return;
+                            }
+
+                            // Standard Logic
                             if (activeScreen != Screens.getActive()) {
                                 activeScreen = Screens.getActive();
                                 Logger.log(Level.DEBUG, "Screen switched to: " + activeScreen);
@@ -91,11 +129,16 @@ public class MacTouchMC implements ClientModInitializer {
                                 if (activeScreen == Screens.INGAME || activeScreen == Screens.GAME_MENU) {
                                     layoutManager.setLayout(inGameLayout);
                                 } else {
-                                    layoutManager.setLayout(menuLayout); // Main menu or unknown -> Info Bar
-                                    // TODO: logic for debugLayout specific triggering? 
-                                    // DebugLayout is typically accessed VIA the InGameLayout popover, not standalone.
+                                    layoutManager.setLayout(menuLayout); 
                                 }
                             }
+                            // Standard Logic
+                            if (activeScreen != Screens.getActive()) {
+                                // ... existing logic ...
+                            }
+                            
+                            // Process Key Release Manager
+                            com.roockydev.mactouchmc.input.KeyReleaseManager.tick();
                         });
                     } else {
                         Logger.log(Level.ERROR, "CRITICAL: Minecraft Window handle is null. Touch Bar cannot be attached.");
@@ -137,10 +180,12 @@ public class MacTouchMC implements ClientModInitializer {
      * currently logs to console, but planned to use In-Game Chat or Toast notifications.
      */
     public void debugWarn(final String string, final Object... arr) {
-        // Implementation moved to Helper or kept here? Kept here for compatibility.
         if (mcClient.inGameHud != null) {
-           // Placeholder for future implementation: Show Toast or Chat message
-           Logger.log(Level.INFO, "[Debug] " + string); // Temporary fallback
+            Logger.log(Level.INFO, "[Debug] " + string); 
         }
     }
+
+    public com.roockydev.mactouchmc.layout.CustomLayout getCustomLayout() { return customLayout; }
+    public InGameLayout getInGameLayout() { return inGameLayout; }
+    public MenuLayout getMenuLayout() { return menuLayout; }
 }

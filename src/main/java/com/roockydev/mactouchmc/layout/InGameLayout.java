@@ -11,13 +11,28 @@ import net.minecraft.client.util.ScreenshotRecorder;
 public class InGameLayout extends BaseLayout {
 
     private final MinecraftClient mcc = MinecraftClient.getInstance();
+    private final com.roockydev.mactouchmc.MacTouchMC mod;
 
-    public InGameLayout() {
+    public InGameLayout(com.roockydev.mactouchmc.MacTouchMC mod) {
         super("inGame");
+        this.mod = mod;
         initWidgets();
     }
 
     private void initWidgets() {
+        // Custom Button (Access to user defined buttons)
+        TBButton customBuilder = new TBButton(ButtonType.MOMENTARY_PUSH_IN)
+            .setTitle("Custom")
+            .setImagePosition(ImagePosition.ONLY); // Icon needed? Maybe a gear or star.
+            // .setIcon(Icons.STAR); // Assuming we add a STAR icon later
+            
+        TBButtonWidget customWidget = new TBButtonWidget("custom_menu", customBuilder);
+        customWidget.getView().setAction(view -> {
+             mod.getCustomLayout().refresh(); // Ensure it's up to date
+             LayoutManager.getInstance().setLayout(mod.getCustomLayout());
+        });
+        addWidget(customWidget);
+
         // Toggle HUD
         TBButton hudBuilder = new TBButton(ButtonType.ON_OFF)
             .setEnabled(!mcc.options.hudHidden)

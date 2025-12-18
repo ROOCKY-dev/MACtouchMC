@@ -31,6 +31,7 @@ public class LayoutManager {
         
         // Only switch if different (or force update logic if needed)
         if (this.currentLayout != layout) {
+            System.out.println("[DEBUG] LayoutManager: Switching layout to " + layout.getClass().getSimpleName());
             this.currentLayout = layout;
             show(layout.getTouchBar());
         }
@@ -39,6 +40,12 @@ public class LayoutManager {
     private void show(JTouchBar touchBar) {
         if (windowHandle != 0) {
             touchBar.show(windowHandle);
+        }
+    }
+
+    public void forceShow() {
+        if (currentLayout != null) {
+            show(currentLayout.getTouchBar());
         }
     }
 
