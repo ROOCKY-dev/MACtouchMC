@@ -8,6 +8,7 @@ import com.thizzer.jtouchbar.JTouchBar;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFWNativeCocoa;
 
@@ -31,6 +32,11 @@ public class MacTouchMC implements ClientModInitializer {
     private static long windowHandle;
     private Screens activeScreen;
     private int tickCounter = 0;
+
+    // Cache for Screen Detection Optimization
+    private Screen lastScreen = null;
+    private String cachedScreenName = "";
+    private boolean lastInConfig = false;
 
     private static JTouchBar inGameTouchBar;
     private static JTouchBar mainTouchBar;
@@ -95,18 +101,26 @@ public class MacTouchMC implements ClientModInitializer {
                         // Register Tick Listener to switch bars based on context
                         ClientTickEvents.END_CLIENT_TICK.register(client -> {
                             
+                            // Optimized Screen Detection
+                            Screen currentScreen = client.currentScreen;
+                            if (currentScreen != lastScreen) {
+                                lastScreen = currentScreen;
+                                cachedScreenName = currentScreen == null ? "" : currentScreen.getClass().getName();
+                                String lowerScreenName = cachedScreenName.toLowerCase();
+                                lastInConfig = lowerScreenName.contains("config") ||
+                                               lowerScreenName.contains("yacl") ||
+                                               lowerScreenName.contains("keybind") ||
+                                               lowerScreenName.contains("controls");
+                            }
+
                             // Debug logging for Screen Detection (Requested by user)
-                            // We log every 20 ticks (1 second) to avoid spam but generally track screens
-                            if (client.player != null && client.player.age % 40 == 0 && client.currentScreen != null) {
-                                 Logger.log(Level.INFO, "[DEBUG] Screen: " + client.currentScreen.getClass().getName());
+                            // We log every 40 ticks (2 seconds) to avoid spam but generally track screens
+                            if (client.player != null && client.player.age % 40 == 0 && currentScreen != null) {
+                                 Logger.log(Level.INFO, "[DEBUG] Screen: " + cachedScreenName);
                             }
 
                             // Prioritize Config Screen Detection
-                            String screenName = client.currentScreen == null ? "" : client.currentScreen.getClass().getName().toLowerCase();
-                            boolean inConfig = screenName.contains("config") || 
-                                               screenName.contains("yacl") || 
-                                               screenName.contains("keybind") || 
-                                               screenName.contains("controls");
+                            boolean inConfig = lastInConfig;
 
                             // Increment tick counter
                             tickCounter++;
@@ -122,8 +136,9 @@ public class MacTouchMC implements ClientModInitializer {
                             }
 
                             // Standard Logic
-                            if (activeScreen != Screens.getActive()) {
-                                activeScreen = Screens.getActive();
+                            Screens currentType = Screens.getActive();
+                            if (activeScreen != currentType) {
+                                activeScreen = currentType;
                                 Logger.log(Level.DEBUG, "Screen switched to: " + activeScreen);
                                 
                                 if (activeScreen == Screens.INGAME || activeScreen == Screens.GAME_MENU) {
@@ -131,10 +146,6 @@ public class MacTouchMC implements ClientModInitializer {
                                 } else {
                                     layoutManager.setLayout(menuLayout); 
                                 }
-                            }
-                            // Standard Logic
-                            if (activeScreen != Screens.getActive()) {
-                                // ... existing logic ...
                             }
                             
                             // Process Key Release Manager
