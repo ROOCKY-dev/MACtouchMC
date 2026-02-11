@@ -45,13 +45,12 @@ public class DebugLayout extends BaseLayout {
             mcc.getEntityRenderDispatcher().setRenderHitboxes(!current);
             boolean newState = mcc.getEntityRenderDispatcher().shouldRenderHitboxes();
             showHitboxes.getView().setTitle(newState ? "enabled" : "disabled");
-            showHitboxes.getView().setImage(Icons.F3_SHOW_HITBOXES.getDefaultIcon(newState)); // Fix: use newState, not false
+            showHitboxes.getView().setImage(Icons.F3_SHOW_HITBOXES.getDefaultIcon(newState));
             mod.debugWarn(newState ? "debug.show_hitboxes.on" : "debug.show_hitboxes.off");
         });
         addWidget(showHitboxes);
         // Show Chunk Boundaries
         TBButtonWidget chunkBoundaries = createWidget("f3_show_chunk_boundaries", "disabled", Icons.F3_SHOW_CHUNK_BOUNDARIES, ButtonType.ON_OFF);
-        // chunkBoundaries.getView().setEnabled(false); // remove
         chunkBoundaries.getView().setAction(view -> {
             boolean show = mcc.debugRenderer.toggleShowChunkBorder();
             chunkBoundaries.getView().setTitle(show ? "enabled" : "disabled");
