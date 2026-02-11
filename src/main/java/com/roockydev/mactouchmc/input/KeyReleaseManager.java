@@ -43,7 +43,6 @@ public class KeyReleaseManager {
         int scancode = GLFW.glfwGetKeyScancode(keyCode);
         
         // Inject RELEASE
-        // System.out.println("[DEBUG] VirtualInputHandler: Releasing Key=" + keyCode);
         client.execute(() -> {
              if (client.keyboard != null) {
                   client.keyboard.onKey(window, keyCode, scancode, GLFW.GLFW_RELEASE, 0);

@@ -1,6 +1,8 @@
 package com.roockydev.mactouchmc.input;
 
+import com.roockydev.mactouchmc.Logger;
 import net.minecraft.client.MinecraftClient;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFW;
 
 public class VirtualInputHandler {
@@ -26,7 +28,7 @@ public class VirtualInputHandler {
         // Inject the key
         if (MinecraftClient.getInstance().keyboard != null) {
              int scancode = GLFW.glfwGetKeyScancode(keyCode);
-             System.out.println("[DEBUG] VirtualInputHandler: Injecting Key=" + keyCode + " Scancode=" + scancode + " Action=" + action);
+             Logger.log(Level.DEBUG, "VirtualInputHandler: Injecting Key=" + keyCode + " Scancode=" + scancode + " Action=" + action);
              MinecraftClient.getInstance().keyboard.onKey(window, keyCode, scancode, action, 0);
              
              // If this was a PRESS action (from TouchBar tap), schedule a RELEASE in 2 ticks
@@ -34,7 +36,7 @@ public class VirtualInputHandler {
                   KeyReleaseManager.scheduleRelease(keyCode, 2);
              }
         } else {
-             System.err.println("Keyboard instance is null!");
+             Logger.log(Level.ERROR, "Keyboard instance is null!");
         }
     }
 }

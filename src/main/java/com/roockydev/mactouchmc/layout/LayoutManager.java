@@ -1,7 +1,9 @@
 package com.roockydev.mactouchmc.layout;
 
+import com.roockydev.mactouchmc.Logger;
 import com.roockydev.mactouchmc.api.TouchBarLayout;
 import com.thizzer.jtouchbar.JTouchBar;
+import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFWNativeCocoa;
 
 /**
@@ -31,7 +33,7 @@ public class LayoutManager {
         
         // Only switch if different (or force update logic if needed)
         if (this.currentLayout != layout) {
-            System.out.println("[DEBUG] LayoutManager: Switching layout to " + layout.getClass().getSimpleName());
+            Logger.log(Level.DEBUG, "LayoutManager: Switching layout to " + layout.getClass().getSimpleName());
             this.currentLayout = layout;
             show(layout.getTouchBar());
         }
